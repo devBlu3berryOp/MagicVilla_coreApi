@@ -105,7 +105,7 @@ namespace MagicVilla_villaApi.Controllers
             patch.ApplyTo(villa, ModelState);
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
             return NoContent();
         }
