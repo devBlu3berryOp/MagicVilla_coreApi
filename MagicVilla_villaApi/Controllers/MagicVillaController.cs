@@ -1,4 +1,5 @@
 ﻿using MagicVilla_villaApi.Data;
+using MagicVilla_villaApi.Logging;
 using MagicVilla_villaApi.Model;
 using MagicVilla_villaApi.Model.DTO;
 using Microsoft.AspNetCore.JsonPatch;
@@ -10,17 +11,25 @@ namespace MagicVilla_villaApi.Controllers
     [ApiController]                     //this helps in checking the data annotation that is applied to the model or else (ModelState.IsValid) is used for that
     public class MagicVillaController : ControllerBase
     {
+        private readonly Ilogger _logger;
+        public MagicVillaController(Ilogger logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet]
         public ActionResult<IEnumerable<VillaDTO>> GetVillas()
         {
+            _logger.log("Getting all villas","");
             return Ok(VillaStore.villaList);
         }
 
-        [HttpGet("{id:int}", Name = "GetVilla")]
+        [HttpGet("{id:int}",Name = "GetVilla")]
         public ActionResult<VillaDTO> GetVilla(int id)
         {
             if (id == 0)
             {
+                _logger.log("Encountered error on villa with id= "+id,"error");
                 return BadRequest();
             }
             var villa = VillaStore.villaList.FirstOrDefault(u => u.Id == id);
@@ -73,7 +82,7 @@ namespace MagicVilla_villaApi.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id:int}", Name = "UpdateVilla")]
+        [HttpPut("{id:int}",Name = "UpdateVilla")]
         public IActionResult UpdateVilla(int id, [FromBody] VillaDTO villadto)
         {
             if (villadto.Id == 0 || id != villadto.Id)
@@ -90,7 +99,7 @@ namespace MagicVilla_villaApi.Controllers
             villa.sqft = villadto.sqft;
             return NoContent();
         }
-        [HttpPatch("{id:int}", Name = "UpdatePartialVilla")]
+        [HttpPatch("{id:int}",Name = "UpdatePartialVilla")]
         public IActionResult UpdatePartialVilla(int id, JsonPatchDocument<VillaDTO> patch)
         {
             if (patch == null || id == 0)
